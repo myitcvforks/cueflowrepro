@@ -1,0 +1,52 @@
+# Test that a flow works with string interpolation
+
+main .
+cmp stdout stdout.golden
+
+-- main.cue --
+package test
+
+A: {
+	input:  "foobar"
+	output: string
+}
+
+B: {
+	input:  "interpolated \(A.output)"
+	output: string
+}
+-- stdout.golden --
+[detected task at "A"]
+[detected task at "B"]
+TASKS
+  ===> A: dependencies:
+  ===> B: dependencies: A
+
+
+PROCESSING "A"
+  setting output for "A" to: "from A: foobar"
+FILLED in A: {
+	input:  "foobar"
+	output: "from A: foobar"
+}
+
+PROCESSING "B"
+  setting output for "B" to: "from B: interpolated from A: foobar"
+FILLED in B: {
+	input:  "interpolated from A: foobar"
+	output: "from B: interpolated from A: foobar"
+}
+
+
+
+ === END RESULT ===
+{
+	A: {
+		input:  "foobar"
+		output: "from A: foobar"
+	}
+	B: {
+		input:  "interpolated from A: foobar"
+		output: "from B: interpolated from A: foobar"
+	}
+}

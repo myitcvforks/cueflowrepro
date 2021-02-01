@@ -15,27 +15,46 @@ import (
 )
 
 func main() {
-	if len(os.Args) < 2 {
-		fmt.Printf("usage: %s <path>\n", os.Args[0])
-		os.Exit(1)
+}
+
+func main1() int {
+	err := mainerr()
+	switch err.(type) {
+	case nil:
+		return 0
+	case usageErr:
+		fmt.Fprintf(os.Stderr, "usage: %s <path>\n", os.Args[0])
+		return 2
+	}
+	errStr := cueerrors.Details(err, nil)
+	fmt.Fprintln(os.Stderr, errStr)
+	return 1
+}
+
+type usageErr string
+
+func (u usageErr) Error() string {
+	return string(u)
+}
+
+func mainerr() error {
+	if len(os.Args) != 2 {
+		return usageErr(fmt.Sprintf("usage: %s <path>\n", os.Args[0]))
 	}
 	root, err := loadCue(os.Args[1])
 	if err != nil {
-		fmt.Println(cueerrors.Details(err, nil))
-		os.Exit(1)
+		return err
 	}
 	root, err = run(context.TODO(), root)
 	if err != nil {
-		fmt.Println(cueerrors.Details(err, nil))
-		os.Exit(1)
+		return err
 	}
 	err = root.Value().Validate(cue.Concrete(true))
 	if err != nil {
-		fmt.Println(cueerrors.Details(err, nil))
-		os.Exit(1)
+		return err
 	}
 	fmt.Printf("\n\n === END RESULT ===\n%s\n", cueDump(root.Value()))
-	// fmt.Printf("%v\n", root.Value())
+	return nil
 }
 
 func loadCue(p string) (*cue.Instance, error) {
@@ -43,16 +62,8 @@ func loadCue(p string) (*cue.Instance, error) {
 
 	binsts := load.Instances([]string{p}, cfg)
 	instances := cue.Build(binsts)
-	root := cue.Merge(instances...)
-	if root.Err != nil {
-		return nil, root.Err
-	}
-
-	if err := root.Value().Validate(); err != nil {
-		return nil, err
-	}
-
-	return root, nil
+	i := instances[0]
+	return i, i.Err
 }
 
 func run(ctx context.Context, root *cue.Instance) (*cue.Instance, error) {
@@ -81,8 +92,11 @@ func run(ctx context.Context, root *cue.Instance) (*cue.Instance, error) {
 				return err
 			}
 
+			outputVal := fmt.Sprintf("from %s: %s", t.Path().String(), output)
+			fmt.Printf("  setting output for %q to: %q\n", t.Path().String(), outputVal)
+
 			return t.Fill(map[string]string{
-				"output": fmt.Sprintf("from %s: %s", t.Path().String(), output),
+				"output": outputVal,
 			})
 		}), nil
 	}
@@ -118,7 +132,11 @@ func run(ctx context.Context, root *cue.Instance) (*cue.Instance, error) {
 		for _, d := range t.Dependencies() {
 			deps = append(deps, d.Path().String())
 		}
-		fmt.Printf("  ===> %s: dependencies: %s\n", t.Path(), strings.Join(deps, ", "))
+		depStr := strings.Join(deps, ", ")
+		if depStr != "" {
+			depStr = " " + depStr
+		}
+		fmt.Printf("  ===> %s: dependencies:%s\n", t.Path(), depStr)
 	}
 	fmt.Printf("\n\n")
 

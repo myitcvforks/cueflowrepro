@@ -1,0 +1,28 @@
+# Test that a flow works with json.Unmarshal
+
+skip 'the setting of output is incorrect'
+
+main .
+cmp stdout stdout.golden
+
+-- main.cue --
+package test
+
+import "encoding/json"
+
+A: {
+	input: """
+		{
+			"hello": "world"
+		}
+		"""
+	output: string
+
+	unmarshalled: json.Unmarshal(output)
+}
+
+B: {
+	input:  A.unmarshalled.hello
+	output: string
+}
+-- stdout.golden --

@@ -1,0 +1,52 @@
+# Test that a basic flow works with no deps
+
+main .
+cmp stdout stdout.golden
+
+-- main.cue --
+package test
+
+A: {
+	input:  "hello"
+	output: string
+}
+
+B: {
+	input:  "world"
+	output: string
+}
+-- stdout.golden --
+[detected task at "A"]
+[detected task at "B"]
+TASKS
+  ===> A: dependencies:
+  ===> B: dependencies:
+
+
+PROCESSING "B"
+  setting output for "B" to: "from B: world"
+PROCESSING "A"
+  setting output for "A" to: "from A: hello"
+FILLED in B: {
+	input:  "world"
+	output: "from B: world"
+}
+
+FILLED in A: {
+	input:  "hello"
+	output: "from A: hello"
+}
+
+
+
+ === END RESULT ===
+{
+	A: {
+		input:  "hello"
+		output: "from A: hello"
+	}
+	B: {
+		input:  "world"
+		output: "from B: world"
+	}
+}
