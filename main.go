@@ -96,7 +96,7 @@ func run(ctx context.Context, root *cue.Instance) (*cue.Instance, error) {
 			fmt.Printf("  setting output for %q to: %q\n", t.Path().String(), outputVal)
 
 			return t.Fill(map[string]string{
-				"output": outputVal,
+				"output": output,
 			})
 		}), nil
 	}

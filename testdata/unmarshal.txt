@@ -1,7 +1,5 @@
 # Test that a flow works with json.Unmarshal
 
-skip 'the setting of output is incorrect'
-
 main .
 cmp stdout stdout.golden
 
@@ -26,3 +24,59 @@ B: {
 	output: string
 }
 -- stdout.golden --
+[detected task at "A"]
+[detected task at "B"]
+TASKS
+  ===> A: dependencies:
+  ===> B: dependencies: A
+
+
+PROCESSING "A"
+  setting output for "A" to: "from A: {\n\t\"hello\": \"world\"\n}"
+FILLED in A: {
+	input: """
+		{
+		\t"hello": "world"
+		}
+		"""
+	output: """
+		{
+		\t"hello": "world"
+		}
+		"""
+	unmarshalled: {
+		hello: "world"
+	}
+}
+
+PROCESSING "B"
+  setting output for "B" to: "from B: world"
+FILLED in B: {
+	input:  "world"
+	output: "world"
+}
+
+
+
+ === END RESULT ===
+{
+	A: {
+		input: """
+			{
+			\t"hello": "world"
+			}
+			"""
+		output: """
+			{
+			\t"hello": "world"
+			}
+			"""
+		unmarshalled: {
+			hello: "world"
+		}
+	}
+	B: {
+		input:  "world"
+		output: "world"
+	}
+}

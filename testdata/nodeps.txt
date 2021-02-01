@@ -29,12 +29,12 @@ PROCESSING "A"
   setting output for "A" to: "from A: hello"
 FILLED in B: {
 	input:  "world"
-	output: "from B: world"
+	output: "world"
 }
 
 FILLED in A: {
 	input:  "hello"
-	output: "from A: hello"
+	output: "hello"
 }
 
 
@@ -43,10 +43,10 @@ FILLED in A: {
 {
 	A: {
 		input:  "hello"
-		output: "from A: hello"
+		output: "hello"
 	}
 	B: {
 		input:  "world"
-		output: "from B: world"
+		output: "world"
 	}
 }

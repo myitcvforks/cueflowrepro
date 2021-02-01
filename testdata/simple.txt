@@ -27,14 +27,14 @@ PROCESSING "A"
   setting output for "A" to: "from A: foobar"
 FILLED in A: {
 	input:  "foobar"
-	output: "from A: foobar"
+	output: "foobar"
 }
 
 PROCESSING "B"
-  setting output for "B" to: "from B: from A: foobar"
+  setting output for "B" to: "from B: foobar"
 FILLED in B: {
-	input:  "from A: foobar"
-	output: "from B: from A: foobar"
+	input:  "foobar"
+	output: "foobar"
 }
 
 
@@ -43,10 +43,10 @@ FILLED in B: {
 {
 	A: {
 		input:  "foobar"
-		output: "from A: foobar"
+		output: "foobar"
 	}
 	B: {
-		input:  "from A: foobar"
-		output: "from B: from A: foobar"
+		input:  "foobar"
+		output: "foobar"
 	}
 }
